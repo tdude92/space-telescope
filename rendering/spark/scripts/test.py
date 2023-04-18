@@ -1,22 +1,8 @@
 from datetime import date, datetime
 
-from pyspark import SparkConf, SparkContext
 from pyspark.sql import SparkSession
 
-spark = (
-    SparkSession.builder.config(
-        "spark.jars.packages", "org.apache.hudi:hudi-spark3.3-bundle_2.12:0.13.0"
-    )
-    .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
-    .config(
-        "spark.sql.catalog.spark_catalog",
-        "org.apache.spark.sql.hudi.catalog.HoodieCatalog",
-    )
-    .config(
-        "spark.sql.extensions", "org.apache.spark.sql.hudi.HoodieSparkSessionExtension"
-    )
-    .getOrCreate()
-)
+spark = SparkSession.builder.getOrCreate()
 
 tableName = "hudi_trips_cow"
 basePath = "file:///tmp/hudi_trips_cow"
