@@ -17,4 +17,8 @@ spark-submit \
     --conf 'spark.serializer=org.apache.spark.serializer.KryoSerializer' \
     --conf 'spark.sql.catalog.spark_catalog=org.apache.spark.sql.hudi.catalog.HoodieCatalog' \
     --conf 'spark.sql.extensions=org.apache.spark.sql.hudi.HoodieSparkSessionExtension' \
+    --conf 'spark.sql.legacy.parquet.nanosAsLong=false' \
+    --conf 'spark.sql.parquet.binaryAsString=false' \
+    --conf 'spark.sql.parquet.int96AsTimestamp=true' \
+    --conf 'spark.sql.caseSensitive=false' \
     "${@:1}"
