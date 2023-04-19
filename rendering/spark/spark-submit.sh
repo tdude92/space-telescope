@@ -1,10 +1,17 @@
-poetry install
+#!/usr/bin/bash
+
+if ! poetry env info; then
+    exit 1
+elif [[ "$VIRTUAL_ENV" == "" ]]; then
+    echo "Error: Poetry env not activated."
+    exit 1
+fi
 
 export PYSPARK_VENV_FILE=pyspark_venv.tar.gz
 export PYSPARK_PYTHON=$(which python3)
 
-poetry run venv-pack -o $PYSPARK_VENV_FILE
-poetry run spark-submit \
+venv-pack -o $PYSPARK_VENV_FILE
+spark-submit \
     --archives $PYSPARK_VENV_FILE \
     --packages org.apache.hudi:hudi-spark3.3-bundle_2.12:0.13.0 \
     --conf 'spark.serializer=org.apache.spark.serializer.KryoSerializer' \
