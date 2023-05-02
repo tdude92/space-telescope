@@ -16,8 +16,7 @@ async fn test_health_check_success() {
 }
 
 fn spawn_app() -> String {
-    let listener = TcpListener::bind("127.0.0.1:0")
-        .expect("Failed to bind TcpListener.");
+    let listener = TcpListener::bind("127.0.0.1:0").expect("Failed to bind TcpListener.");
     let port = listener.local_addr().unwrap().port();
     let server = space_telescope::run(listener).expect("Failed to bind address");
 
