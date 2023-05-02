@@ -1,0 +1,24 @@
+[package]
+name = "space-telescope"
+description = "Backend server for Space Telescope"
+version = "0.1.0"
+authors = ["Trevor Du <t34du@uwaterloo.ca>"]
+license = "MIT"
+edition = "2021"
+rust-version = "1.68"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+path = "src/main.rs"
+name = "space-telescope"
+
+[dependencies]
+actix-web = "4"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+utoipa = "3"
+utoipa-swagger-ui = { version = "3", features = ["actix-web", "debug-embed"] }
+
+[dev-dependencies]
+reqwest = "0.11"
