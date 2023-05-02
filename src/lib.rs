@@ -1,3 +1,5 @@
+use std::net::TcpListener;
+
 use actix_web::{
     web,
     App,
@@ -6,6 +8,7 @@ use actix_web::{
     HttpServer,
     Responder,
 };
+use actix_web::dev::Server;
 use utoipa::{OpenApi};
 use utoipa_swagger_ui::SwaggerUi;
 
@@ -18,7 +21,7 @@ async fn health_check(_: HttpRequest) -> impl Responder {
     HttpResponse::Ok()
 }
 
-pub async fn run() -> std::io::Result<()> {
+pub fn run(listener: TcpListener) -> Result<Server, std::io::Error> {
     #[derive(OpenApi)]
     #[openapi(
         info(description = "space_telescope backend API."),
@@ -26,7 +29,7 @@ pub async fn run() -> std::io::Result<()> {
     )]
     struct ApiDoc;
 
-    HttpServer::new(move || {
+    let server = HttpServer::new(move || {
         App::new()
             .service(
                 SwaggerUi::new("/docs/{_:.*}")
@@ -34,7 +37,8 @@ pub async fn run() -> std::io::Result<()> {
             )
             .route("/health_check", web::get().to(health_check))
     })
-    .bind("127.0.0.1:8000")?
-    .run()
-    .await
+    .listen(listener)?
+    .run();
+
+    Ok(server)
 }
