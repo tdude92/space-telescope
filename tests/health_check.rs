@@ -40,12 +40,12 @@ async fn test_post_renders_returns_202_for_valid_body_fields() {
     let body = json!({
         "fov": [50f32, 50f32],
         "image_dimensions": [256u32, 256u32],
-        "observer_position": [0f32, 0f32, 0f32],
         "fundamental_plane_bases": [
             [1f32, 0f32, 0f32],
             [0f32, 1f32, 0f32],
         ],
         "primary_direction": [1f32, 0f32, 0f32],
+        "observer_position": [0f32, 0f32, 0f32],
         "latitude": -45f32,
         "longitude": 120f32,
         "filters": [
@@ -78,12 +78,12 @@ async fn test_post_renders_returns_400_for_missing_body_fields() {
     let body = json!({
         "fov": [50f32, 50f32],
         "image_dimensions": [256u32, 256u32],
-        "observer_position": [0f32, 0f32, 0f32],
         "fundamental_plane_bases": [
             [1f32, 0f32, 0f32],
             [0f32, 1f32, 0f32],
         ],
         "primary_direction": [1f32, 0f32, 0f32],
+        "observer_position": [0f32, 0f32, 0f32],
         "latitude": -45f32,
         // Oops! Forgot the longitude
         "filters": [
@@ -116,12 +116,12 @@ async fn test_post_renders_returns_400_for_nonpositive_fov_values() {
     let body_zero = json!({
         "fov": [50f32, 0f32],
         "image_dimensions": [256u32, 256u32],
-        "observer_position": [0f32, 0f32, 0f32],
         "fundamental_plane_bases": [
             [1f32, 0f32, 0f32],
             [0f32, 1f32, 0f32],
         ],
         "primary_direction": [1f32, 0f32, 0f32],
+        "observer_position": [0f32, 0f32, 0f32],
         "latitude": -45f32,
         "longitude": 120f32,
         "filters": [
@@ -135,12 +135,12 @@ async fn test_post_renders_returns_400_for_nonpositive_fov_values() {
     let body_negative = json!({
         "fov": [-50f32, 50f32],
         "image_dimensions": [256u32, 256u32],
-        "observer_position": [0f32, 0f32, 0f32],
         "fundamental_plane_bases": [
             [1f32, 0f32, 0f32],
             [0f32, 1f32, 0f32],
         ],
         "primary_direction": [1f32, 0f32, 0f32],
+        "observer_position": [0f32, 0f32, 0f32],
         "latitude": -45f32,
         "longitude": 120f32,
         "filters": [
@@ -181,12 +181,12 @@ async fn test_post_renders_returns_400_for_parallel_fundamental_plane_vectors() 
     let body = json!({
         "fov": [50f32, 50f32],
         "image_dimensions": [256u32, 256u32],
-        "observer_position": [0f32, 0f32, 0f32],
         "fundamental_plane_bases": [
-            [0.2f32, 0f32, 0.3f32],
-            [0.4f32, 0f32, 0.6f32],
+            [0.23456f32, 0f32, 0.3f32],
+            [0.46912f32, 0f32, 0.6f32],
         ],
         "primary_direction": [1f32, 0f32, 0f32],
+        "observer_position": [0f32, 0f32, 0f32],
         "latitude": -45f32,
         "longitude": 120f32,
         "filters": [
@@ -219,12 +219,12 @@ async fn test_post_renders_returns_400_for_latitude_out_of_range() {
     let body_negative = json!({
         "fov": [50f32, 50f32],
         "image_dimensions": [256u32, 256u32],
-        "observer_position": [0f32, 0f32, 0f32],
         "fundamental_plane_bases": [
             [1f32, 0f32, 0f32],
             [0f32, 1f32, 0f32],
         ],
         "primary_direction": [1f32, 0f32, 0f32],
+        "observer_position": [0f32, 0f32, 0f32],
         "latitude": -91f32,
         "longitude": 120f32,
         "filters": [
@@ -238,12 +238,12 @@ async fn test_post_renders_returns_400_for_latitude_out_of_range() {
     let body_positive = json!({
         "fov": [50f32, 50f32],
         "image_dimensions": [256u32, 256u32],
-        "observer_position": [0f32, 0f32, 0f32],
         "fundamental_plane_bases": [
             [1f32, 0f32, 0f32],
             [0f32, 1f32, 0f32],
         ],
         "primary_direction": [1f32, 0f32, 0f32],
+        "observer_position": [0f32, 0f32, 0f32],
         "latitude": 91f32,
         "longitude": 120f32,
         "filters": [
