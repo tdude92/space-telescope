@@ -35,6 +35,19 @@ struct RenderJob {
     filters: Vec<AstronomicalFilter>,
 }
 
+#[derive(serde::Serialize)]
+struct BadRequestResponseBody {
+    error_message: String,
+}
+
+impl BadRequestResponseBody {
+    fn new(error_message: &str) -> Self {
+        Self {
+            error_message: error_message.to_string(),
+        }
+    }
+}
+
 #[utoipa::path(
     get,
     path = "/health_check",
@@ -57,17 +70,25 @@ async fn submit_render_request(body: web::Json<RenderJob>) -> impl Responder {
     // TODO modulo longitude 360
     // TODO project primary direction onto fundamental plane
     if body.latitude > 90.0 || body.latitude < -90.0 {
-        HttpResponse::BadRequest()
+        HttpResponse::BadRequest().json(BadRequestResponseBody::new(&format!(
+            "Latitude is invalid with value: {} deg.",
+            body.latitude,
+        )))
     } else if body.fov[0] <= 0.0 || body.fov[1] <= 0.0 {
-        HttpResponse::BadRequest()
+        HttpResponse::BadRequest().json(BadRequestResponseBody::new(&format!(
+            "FOV is invalid with values x={} y={}.",
+            body.fov[0], body.fov[1],
+        )))
     } else if body.fundamental_plane_bases[0]
         .cross(&body.fundamental_plane_bases[1])
         .norm_squared()
         == 0.0
     {
-        HttpResponse::BadRequest()
+        HttpResponse::BadRequest().json(BadRequestResponseBody::new(
+            "Fundamental plane bases are parallel.",
+        ))
     } else {
-        HttpResponse::Accepted()
+        HttpResponse::Accepted().finish()
     }
 }
 
