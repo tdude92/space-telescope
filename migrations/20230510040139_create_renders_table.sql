@@ -1,6 +1,7 @@
-CREATE TABLE render_jobs(
+CREATE TABLE renders(
     id uuid NOT NULL,
     PRIMARY KEY (id),
+    image_url text,
     created_at timestamp NOT NULL,
     fov_x real NOT NULL,
     fov_y real NOT NULL,
@@ -12,5 +13,5 @@ CREATE TABLE render_jobs(
     latitude real NOT NULL,
     longitude real NOT NULL,
     broadband_filters text[],
-    narrowband_filters real[],
+    narrowband_filters real[]
 );

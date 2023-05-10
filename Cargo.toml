@@ -23,5 +23,17 @@ tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 utoipa = "3"
 utoipa-swagger-ui = { version = "3", features = ["actix-web", "debug-embed"] }
 
+[dependencies.sqlx]
+version = "0.5.7"
+default-features = false
+features = [
+    "runtime-actix-rustls",
+    "macros",
+    "postgres",
+    "uuid",
+    "chrono",
+    "migrate"
+]
+
 [dev-dependencies]
 reqwest = "0.11"
