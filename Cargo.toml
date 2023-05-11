@@ -16,6 +16,7 @@ name = "space-telescope"
 
 [dependencies]
 actix-web = "4"
+chrono = "0.4.15"
 config = "0.11"
 nalgebra = { version = "0.32.2", features = ["serde-serialize"]}
 serde = "1.0.162"
@@ -23,6 +24,7 @@ serde_json = "1.0"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 utoipa = "3"
 utoipa-swagger-ui = { version = "3", features = ["actix-web", "debug-embed"] }
+uuid = { version = "0.8.1", features = ["v4"] }
 
 [dependencies.sqlx]
 version = "0.5.7"
