@@ -2,13 +2,14 @@ use std::net::TcpListener;
 
 use actix_web::dev::Server;
 use actix_web::{web, App, HttpServer};
+use sqlx::PgConnection;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
 use crate::routes::health_check::{__path_health_check, health_check};
 use crate::routes::renders::{__path_submit_render_request, submit_render_request};
 
-pub fn run(listener: TcpListener) -> Result<Server, std::io::Error> {
+pub fn run(listener: TcpListener, db_connection: PgConnection) -> Result<Server, std::io::Error> {
     #[derive(OpenApi)]
     #[openapi(
         info(description = "space_telescope backend API."),
@@ -16,11 +17,13 @@ pub fn run(listener: TcpListener) -> Result<Server, std::io::Error> {
     )]
     struct ApiDoc;
 
+    let db_connection = web::Data::new(db_connection);
     let server = HttpServer::new(move || {
         App::new()
             .service(SwaggerUi::new("/docs/{_:.*}").url("/openapi.json", ApiDoc::openapi()))
             .route("/health_check", web::get().to(health_check))
             .route("/renders", web::post().to(submit_render_request))
+            .app_data(db_connection.clone())
     })
     .listen(listener)?
     .run();
