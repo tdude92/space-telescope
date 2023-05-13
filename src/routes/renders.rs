@@ -86,6 +86,13 @@ impl RenderJob {
         (status = 400, description = "Render job request body malformed.")
     )
 )]
+#[tracing::instrument(
+    name = "Inserting new render job into queue",
+    skip(body, db_pool),
+    fields(
+        request_id = %Uuid::new_v4()
+    )
+)]
 pub async fn submit_render_request(
     body: web::Json<RenderJob>,
     db_pool: web::Data<PgPool>,
@@ -96,16 +103,21 @@ pub async fn submit_render_request(
     // fundamental bases are not parallel vectors
     // modulo longitude 360
     // project primary direction onto fundamental plane
-    let request_id = Uuid::new_v4();
-    let request_span = tracing::info_span!(
-        "Inserting new render job into queue",
-        %request_id
-    );
-    let _request_span_guard = request_span.enter();
+    match insert_render_job(&body, &db_pool).await {
+        Ok(_) => HttpResponse::Accepted().finish(),
+        Err(e) => HttpResponse::InternalServerError().finish(),
+    }
+}
 
-    let query_span = tracing::info_span!("Saving new render job details in the database");
+#[tracing::instrument(
+    name = "Saving new render job details in the database",
+    skip(body, db_pool),
+    fields(render_id)
+)]
+pub async fn insert_render_job(body: &RenderJob, db_pool: &PgPool) -> Result<(), sqlx::Error> {
     let render_id = Uuid::new_v4();
-    match sqlx::query!(
+    tracing::Span::current().record("render_id", render_id.to_string());
+    sqlx::query!(
         r#"
         INSERT INTO renders (
             id,
@@ -139,14 +151,11 @@ pub async fn submit_render_request(
         &body.narrowband_filters(),
         &body.broadband_filters(),
     )
-    .execute(db_pool.as_ref())
-    .instrument(query_span)
+    .execute(db_pool)
     .await
-    {
-        Ok(_) => HttpResponse::Accepted().finish(),
-        Err(e) => {
-            tracing::error!("Failed to execute query: {:?}", e);
-            HttpResponse::InternalServerError().finish()
-        }
-    }
+    .map_err(|e| {
+        tracing::error!("Failed to execute query: {:?}", e);
+        e
+    })?;
+    Ok(())
 }
