@@ -1,10 +1,10 @@
 use std::net::TcpListener;
 
 use actix_web::dev::Server;
-use actix_web::middleware::Logger;
 use actix_web::web::Data;
 use actix_web::{web, App, HttpServer};
 use sqlx::PgPool;
+use tracing_actix_web::TracingLogger;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
@@ -23,7 +23,7 @@ pub fn run(listener: TcpListener, db_pool: PgPool) -> Result<Server, std::io::Er
     let server = HttpServer::new(move || {
         App::new()
             .service(SwaggerUi::new("/docs/{_:.*}").url("/openapi.json", ApiDoc::openapi()))
-            .wrap(Logger::default())
+            .wrap(TracingLogger::default())
             .route("/health_check", web::get().to(health_check))
             .route("/renders", web::post().to(submit_render_request))
             .app_data(db_pool.clone())

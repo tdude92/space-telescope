@@ -2,7 +2,6 @@ use actix_web::{web, HttpResponse, Responder};
 use chrono::Utc;
 use nalgebra as na;
 use sqlx::PgPool;
-use tracing::Instrument;
 use uuid::Uuid;
 
 // TODO fill this out
@@ -86,13 +85,7 @@ impl RenderJob {
         (status = 400, description = "Render job request body malformed.")
     )
 )]
-#[tracing::instrument(
-    name = "Inserting new render job into queue",
-    skip(body, db_pool),
-    fields(
-        request_id = %Uuid::new_v4()
-    )
-)]
+#[tracing::instrument(name = "Inserting new render job into queue", skip(body, db_pool))]
 pub async fn submit_render_request(
     body: web::Json<RenderJob>,
     db_pool: web::Data<PgPool>,
@@ -105,7 +98,7 @@ pub async fn submit_render_request(
     // project primary direction onto fundamental plane
     match insert_render_job(&body, &db_pool).await {
         Ok(_) => HttpResponse::Accepted().finish(),
-        Err(e) => HttpResponse::InternalServerError().finish(),
+        Err(_) => HttpResponse::InternalServerError().finish(),
     }
 }
 
