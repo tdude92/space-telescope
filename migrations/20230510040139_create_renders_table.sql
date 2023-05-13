@@ -2,6 +2,7 @@ CREATE TABLE renders(
     id uuid NOT NULL,
     PRIMARY KEY (id),
     created_at timestamptz NOT NULL,
+    email text NOT NULL,
     fov_x real NOT NULL,
     fov_y real NOT NULL,
     image_dimension_x integer NOT NULL,

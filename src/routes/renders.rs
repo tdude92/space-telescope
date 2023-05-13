@@ -44,6 +44,7 @@ impl FundamentalPlane {
 // TODO impl utoipa::ToSchema
 #[derive(serde::Deserialize)]
 pub struct RenderJob {
+    email: String,
     fov: [f32; 2],
     image_dimensions: [i32; 2],
     fundamental_plane: FundamentalPlane,
@@ -94,11 +95,13 @@ pub async fn submit_render_request(
     // fundamental bases are not parallel vectors
     // modulo longitude 360
     // project primary direction onto fundamental plane
+    log::info!("Saving new render job into the database");
     match sqlx::query!(
         r#"
         INSERT INTO renders (
             id,
             created_at,
+            email,
             fov_x,
             fov_y,
             image_dimension_x,
@@ -110,10 +113,11 @@ pub async fn submit_render_request(
             longitude,
             narrowband_filters,
             broadband_filters
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
         "#,
         Uuid::new_v4(),
         Utc::now(),
+        body.email,
         body.fov[0],
         body.fov[1],
         body.image_dimensions[0],
@@ -129,9 +133,12 @@ pub async fn submit_render_request(
     .execute(db_pool.get_ref())
     .await
     {
-        Ok(_) => HttpResponse::Accepted().finish(),
+        Ok(_) => {
+            log::info!("New render job has been saved");
+            HttpResponse::Accepted().finish()
+        }
         Err(e) => {
-            println!("Failed to execute query: {}", e);
+            log::error!("Failed to execute query: {:?}", e);
             HttpResponse::InternalServerError().finish()
         }
     }
