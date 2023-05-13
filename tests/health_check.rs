@@ -1,9 +1,10 @@
 use std::net::TcpListener;
 
 use serde_json::json;
-use sqlx::PgPool;
+use sqlx::{Connection, Executor, PgConnection, PgPool};
+use uuid::Uuid;
 
-use space_telescope::configuration::get_configuration;
+use space_telescope::configuration::{get_configuration, DatabaseSettings};
 use space_telescope::startup::run;
 
 pub struct TestApp {
@@ -18,15 +19,37 @@ async fn spawn_app() -> TestApp {
     let port = listener.local_addr().unwrap().port();
     let address = format!("http://127.0.0.1:{}", port);
 
-    let configuration = get_configuration().expect("Failed to read configuration.");
-    let db_pool = PgPool::connect(&configuration.database.connection_string())
-        .await
-        .expect("Failed to connect to Postgres");
+    let mut configuration = get_configuration().expect("Failed to read configuration.");
+    configuration.database.database_name = Uuid::new_v4().to_string();
+
+    let db_pool = configure_database(&configuration.database).await;
 
     let server = run(listener, db_pool.clone()).expect("Failed to bind address");
     tokio::spawn(server);
 
     TestApp { address, db_pool }
+}
+
+pub async fn configure_database(db_config: &DatabaseSettings) -> PgPool {
+    let mut db_connection = PgConnection::connect(&db_config.connection_string_instance())
+        .await
+        .expect("Failed to connect to Postgres.");
+
+    db_connection
+        .execute(format!(r#"CREATE DATABASE "{}";"#, &db_config.database_name).as_str())
+        .await
+        .expect("Failed to create database.");
+
+    let db_pool = PgPool::connect(&db_config.connection_string_db())
+        .await
+        .expect("Failed to connect to Postgres.");
+
+    sqlx::migrate!("./migrations")
+        .run(&db_pool)
+        .await
+        .expect("Failed to migrate the database.");
+
+    db_pool
 }
 
 #[tokio::test]
