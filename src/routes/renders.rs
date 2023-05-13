@@ -2,6 +2,7 @@ use actix_web::{web, HttpResponse, Responder};
 use chrono::Utc;
 use nalgebra as na;
 use sqlx::PgPool;
+use tracing::Instrument;
 use uuid::Uuid;
 
 // TODO fill this out
@@ -95,7 +96,15 @@ pub async fn submit_render_request(
     // fundamental bases are not parallel vectors
     // modulo longitude 360
     // project primary direction onto fundamental plane
-    log::info!("Saving new render job into the database");
+    let request_id = Uuid::new_v4();
+    let request_span = tracing::info_span!(
+        "Inserting new render job into queue",
+        %request_id
+    );
+    let _request_span_guard = request_span.enter();
+
+    let query_span = tracing::info_span!("Saving new render job details in the database");
+    let render_id = Uuid::new_v4();
     match sqlx::query!(
         r#"
         INSERT INTO renders (
@@ -115,7 +124,7 @@ pub async fn submit_render_request(
             broadband_filters
         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
         "#,
-        Uuid::new_v4(),
+        render_id,
         Utc::now(),
         body.email,
         body.fov[0],
@@ -130,15 +139,13 @@ pub async fn submit_render_request(
         &body.narrowband_filters(),
         &body.broadband_filters(),
     )
-    .execute(db_pool.get_ref())
+    .execute(db_pool.as_ref())
+    .instrument(query_span)
     .await
     {
-        Ok(_) => {
-            log::info!("New render job has been saved");
-            HttpResponse::Accepted().finish()
-        }
+        Ok(_) => HttpResponse::Accepted().finish(),
         Err(e) => {
-            log::error!("Failed to execute query: {:?}", e);
+            tracing::error!("Failed to execute query: {:?}", e);
             HttpResponse::InternalServerError().finish()
         }
     }
