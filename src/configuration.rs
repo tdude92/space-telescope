@@ -36,7 +36,7 @@ pub struct Settings {
 }
 
 #[derive(serde::Deserialize)]
-pub struct Settings {
+pub struct ApplicationSettings {
     pub host: String,
     pub port: u16,
 }
