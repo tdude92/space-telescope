@@ -10,21 +10,23 @@ use space_telescope::telemetry::{get_subscriber, init_subscriber};
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
     // Setup tracing
-    let subscriber = get_subscriber("space_telescope", "info", std::io::stdout);
+    let subscriber = get_subscriber("space-telescope", "info", std::io::stdout);
     init_subscriber(subscriber);
 
     let configuration = get_configuration().expect("Failed to read configuration");
 
-    let db_pool = PgPool::connect(
+    let db_pool = PgPool::connect_lazy(
         &configuration
             .database
             .connection_string_db()
             .expose_secret(),
     )
-    .await
-    .expect("Failed to connect to Postgres");
+    .expect("Failed to create Postgres connection pool.");
 
-    let address = format!("127.0.0.1:{}", configuration.port);
+    let address = format!(
+        "{}:{}",
+        configuration.application.host, configuration.application.port
+    );
     let listener = TcpListener::bind(address)?;
     run(listener, db_pool)?.await
 }

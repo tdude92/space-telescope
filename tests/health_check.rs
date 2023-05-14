@@ -98,7 +98,7 @@ async fn test_post_renders_returns_202_for_valid_body_fields() {
 
     // Act
     let body = json!({
-        "email": "test@space_telescope.com",
+        "email": "test@space-telescope.com",
         "fov": [50f32, 51f32],
         "image_dimensions": [256u32, 257u32],
         "fundamental_plane": {
@@ -169,7 +169,7 @@ async fn test_post_renders_returns_400_for_missing_body_fields() {
 
     // Act
     let body = json!({
-        "email": "test@space_telescope.com",
+        "email": "test@space-telescope.com",
         "fov": [50f32, 51f32],
         "image_dimensions": [256u32, 257u32],
         "fundamental_plane": {
@@ -208,7 +208,7 @@ async fn test_post_renders_returns_400_for_nonpositive_fov_values() {
 
     // Act
     let body_zero = json!({
-        "email": "test@space_telescope.com",
+        "email": "test@space-telescope.com",
         "fov": [50f32, 0f32],
         "image_dimensions": [256u32, 257u32],
         "fundamental_plane": {
@@ -228,7 +228,7 @@ async fn test_post_renders_returns_400_for_nonpositive_fov_values() {
         ],
     });
     let body_negative = json!({
-        "email": "test@space_telescope.com",
+        "email": "test@space-telescope.com",
         "fov": [-50f32, 50f32],
         "image_dimensions": [256u32, 257u32],
         "fundamental_plane": {
@@ -275,7 +275,7 @@ async fn test_post_renders_returns_400_for_parallel_fundamental_plane_vectors() 
 
     // Act
     let body = json!({
-        "email": "test@space_telescope.com",
+        "email": "test@space-telescope.com",
         "fov": [50f32, 51f32],
         "image_dimensions": [256u32, 257u32],
         "fundamental_plane": {
@@ -314,7 +314,7 @@ async fn test_post_renders_returns_400_for_latitude_out_of_range() {
 
     // Act
     let body_negative = json!({
-        "email": "test@space_telescope.com",
+        "email": "test@space-telescope.com",
         "fov": [50f32, 51f32],
         "image_dimensions": [256u32, 257u32],
         "fundamental_plane": {
@@ -334,7 +334,7 @@ async fn test_post_renders_returns_400_for_latitude_out_of_range() {
         ],
     });
     let body_positive = json!({
-        "email": "test@space_telescope.com",
+        "email": "test@space-telescope.com",
         "fov": [50f32, 50f32],
         "image_dimensions": [256u32, 256u32],
         "fundamental_plane": {

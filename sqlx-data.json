@@ -1,0 +1,28 @@
+{
+  "db": "PostgreSQL",
+  "c09b9547e614b777c257b701b1e0ac40eaaed3aaf20a1d13ec5ee7bc1766cac4": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid",
+          "Timestamptz",
+          "Text",
+          "Float4",
+          "Float4",
+          "Int4",
+          "Int4",
+          "Float4Array",
+          "Float4Array",
+          "Float4Array",
+          "Float4",
+          "Float4",
+          "Float4Array",
+          "TextArray"
+        ]
+      }
+    },
+    "query": "\n        INSERT INTO renders (\n            id,\n            created_at,\n            email,\n            fov_x,\n            fov_y,\n            image_dimension_x,\n            image_dimension_y,\n            fundamental_plane_basis_vector_1,\n            fundamental_plane_basis_vector_2,\n            observer_position,\n            latitude,\n            longitude,\n            narrowband_filters,\n            broadband_filters\n        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)\n        "
+  }
+}

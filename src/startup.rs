@@ -14,7 +14,7 @@ use crate::routes::renders::{__path_submit_render_request, submit_render_request
 pub fn run(listener: TcpListener, db_pool: PgPool) -> Result<Server, std::io::Error> {
     #[derive(OpenApi)]
     #[openapi(
-        info(description = "space_telescope backend API."),
+        info(description = "space-telescope backend API."),
         paths(health_check, submit_render_request)
     )]
     struct ApiDoc;
